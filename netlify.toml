@@ -8,6 +8,5 @@
     # Combined all sources into one single-line string below
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com fonts.gstatic.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: blob: *.supabase.co; connect-src 'self' *.supabase.co api.resend.com api.telegram.org; frame-src maps.google.com www.google.com;"
 
-[[edge_functions]]
-  path = "/api/notify"
-  function = "notify"
+[functions]
+  directory = "netlify/functions"
