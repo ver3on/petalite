@@ -118,7 +118,7 @@ exports.handler = async (event) => {
 
     await supabase.from('unlock_tokens').insert({
       token,
-      notification_mode: notifMode,
+      notification_mode: 'email',
       email_expires_at: emailExpiresAt
     });
 

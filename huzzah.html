@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/animations.css" />
   <link rel="stylesheet" href="css/huzzah.css" />
+  <link rel="stylesheet" href="css/huzzah-locker.css" />
 </head>
 <body>
 
@@ -22,12 +23,16 @@
 </div>
 
 <div id="troll-screen" class="fullscreen-overlay hidden">
-  <div class="lock-box animate-scale-in">
-    <div class="lock-icon">🌸</div>
-    <h2>Nothing to see here.</h2>
-    <p>This page is private.</p>
-  </div>
+  <div id="troll-icon">🌸</div>
+  <svg id="troll-check" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
+    style="display:none;width:80px;height:80px;">
+    <circle cx="50" cy="50" r="38"/>
+    <path d="M30 50 L44 64 L70 36"/>
+  </svg>
+  <div class="troll-title">NOTHING TO SEE HERE</div>
+  <p class="troll-sub">This console is private. An unlock link has been sent.</p>
 </div>
+<div id="troll-flash"></div>
 
 <div id="login-screen" class="fullscreen-overlay">
   <div class="lock-box animate-scale-in">
@@ -227,7 +232,7 @@
   window.supabase = createClient(PETAL_CONFIG.supabaseUrl, PETAL_CONFIG.supabaseAnonKey);
 
   // load scripts sequentially
-  const scripts = ['js/theme.js','js/toast.js','js/calls.js','js/huzzah-auth.js','js/huzzah-main.js'];
+  const scripts = ['js/theme.js','js/toast.js','js/calls.js','js/huzzah-main.js','js/huzzah-auth.js'];
   for (const src of scripts) {
     await new Promise((res, rej) => {
       const s = document.createElement('script');
@@ -236,6 +241,9 @@
     });
   }
 </script>
+
+<link rel="stylesheet" href="css/huzzah-locker.css" />
+<script src="js/huzzah-locker.js" defer></script>
 
 </body>
 </html>

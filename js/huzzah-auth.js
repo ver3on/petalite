@@ -1,86 +1,77 @@
-const COOLDOWNS = [30, 60, 300, 900];
-const MAX_ATTEMPTS = 3;
 const CONSOLE_PASSWORD_KEY = 'petal_console_authed';
 
-let failedAttempts = 0;
-
-async function checkLockout() {
-  const rows = await fetchLatestLockout();
-  if (!rows || rows.length === 0) return null;
-
-  const latest = rows.find(r => r.lockout_until);
-  if (!latest) return null;
-
-  const until = new Date(latest.lockout_until);
-  if (until > new Date()) return until;
-  return null;
-}
-
-function startLockoutTimer(until) {
-  const screen = document.getElementById('lockout-screen');
-  const timer = document.getElementById('lockout-timer');
-  const login = document.getElementById('login-screen');
-
-  screen.classList.remove('hidden');
-  login.classList.add('hidden');
-
-  const interval = setInterval(() => {
-    const diff = Math.max(0, Math.ceil((until - new Date()) / 1000));
-    const m = Math.floor(diff / 60);
-    const s = diff % 60;
-    timer.textContent = `Unlocks in ${m}:${s.toString().padStart(2, '0')}`;
-
-    if (diff <= 0) {
-      clearInterval(interval);
-      screen.classList.add('hidden');
-      login.classList.remove('hidden');
-      clearAuthAttempts();
+async function checkLockoutOnLoad() {
+  try {
+    const res = await fetch('/.netlify/functions/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: '__lockcheck__' })
+    });
+    if (res.status === 423) {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('troll-screen').classList.remove('hidden');
+      runTrollSequence();
     }
-  }, 1000);
+  } catch (e) {
+    // network error on load — do nothing
+  }
 }
 
 async function handleLogin(e) {
   e.preventDefault();
 
-  const lockout = await checkLockout();
-  if (lockout) {
-    startLockoutTimer(lockout);
-    return;
-  }
-
-  const pw = document.getElementById('login-password').value.trim();
-  const correct = pw === (window.PETAL_ADMIN_PASSWORD || 'petal2025');
-
-  if (correct) {
-    sessionStorage.setItem(CONSOLE_PASSWORD_KEY, '1');
-    await clearAuthAttempts();
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app').classList.remove('hidden');
-    initConsole();
-    return;
-  }
-
-  failedAttempts++;
-  const remaining = MAX_ATTEMPTS - failedAttempts;
-  const attemptsDisplay = document.getElementById('attempts-display');
+  const btn = e.target.querySelector('[type="submit"]');
   const loginError = document.getElementById('login-error');
+  const attemptsDisplay = document.getElementById('attempts-display');
 
-  loginError.classList.remove('hidden');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+  loginError.classList.add('hidden');
 
-  if (failedAttempts >= MAX_ATTEMPTS) {
-    const cooldownIndex = Math.min(failedAttempts - MAX_ATTEMPTS, COOLDOWNS.length - 1);
-    const seconds = COOLDOWNS[cooldownIndex];
-    const until = new Date(Date.now() + seconds * 1000);
-    await insertAuthAttempt(until.toISOString());
-    loginError.textContent = `Too many attempts. Locked for ${seconds >= 60 ? seconds / 60 + ' min' : seconds + ' sec'}.`;
-    startLockoutTimer(until);
-  } else {
-    await insertAuthAttempt(null);
-    loginError.textContent = `Incorrect password. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`;
-    attemptsDisplay.textContent = `${failedAttempts} of ${MAX_ATTEMPTS} attempts used`;
+  const pw = document.getElementById('login-password').value;
+
+  try {
+    const res = await fetch('/.netlify/functions/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+
+    if (res.status === 423) {
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('troll-screen').classList.remove('hidden');
+      runTrollSequence();
+      return;
+    }
+
+    const data = await res.json();
+
+    if (data.success) {
+      sessionStorage.setItem(CONSOLE_PASSWORD_KEY, '1');
+      document.getElementById('login-screen').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      initConsole();
+      return;
+    }
+
+    loginError.classList.remove('hidden');
+    const remaining = data.remaining;
+    loginError.textContent = remaining != null
+      ? `Incorrect password. ${remaining} attempt${remaining === 1 ? '' : 's'} remaining.`
+      : 'Incorrect password.';
+
+    if (remaining != null) {
+      attemptsDisplay.textContent = `${3 - remaining} of 3 attempts used`;
+    }
+
+  } catch (err) {
+    loginError.classList.remove('hidden');
+    loginError.textContent = 'Connection error. Try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enter';
+    document.getElementById('login-password').value = '';
   }
-
-  document.getElementById('login-password').value = '';
 }
 
 async function initAuth() {
@@ -93,13 +84,7 @@ async function initAuth() {
     return;
   }
 
-  const lockout = await checkLockout();
-  if (lockout) {
-    document.getElementById('login-screen').classList.add('hidden');
-    startLockoutTimer(lockout);
-    return;
-  }
-
+  await checkLockoutOnLoad();
   document.getElementById('login-form').addEventListener('submit', handleLogin);
 }
 

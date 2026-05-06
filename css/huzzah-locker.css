@@ -1,0 +1,77 @@
+#troll-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+  padding: 2rem;
+  z-index: 1000;
+}
+
+#troll-screen:not(.hidden) {
+  display: flex;
+}
+
+.troll-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent-text);
+  letter-spacing: 0.05em;
+}
+
+.troll-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+#troll-icon {
+  font-size: 4rem;
+  transition: opacity 0.5s ease;
+}
+
+#troll-check circle {
+  fill: none;
+  stroke: #276749;
+  stroke-width: 4;
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+#troll-check path {
+  fill: none;
+  stroke: #276749;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  transition: stroke-dashoffset 0.4s ease 0.3s;
+}
+
+#troll-check.drawn circle { stroke-dashoffset: 0; }
+#troll-check.drawn path  { stroke-dashoffset: 0; }
+
+#troll-check.pulse {
+  animation: checkPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes checkPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.93); }
+}
+
+#troll-flash {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 9999;
+  pointer-events: none;
+}

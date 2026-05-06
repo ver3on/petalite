@@ -5,8 +5,13 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
-    # Combined all sources into one single-line string below
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com fonts.gstatic.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: blob: *.supabase.co; connect-src 'self' *.supabase.co api.resend.com api.telegram.org; frame-src maps.google.com www.google.com;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net fonts.googleapis.com; style-src 'self' 'unsafe-inline' fonts.googleapis.com fonts.gstatic.com; font-src 'self' fonts.gstatic.com; img-src 'self' data: blob: *.supabase.co; connect-src 'self' *.supabase.co *.jsdelivr.net api.resend.com; frame-src maps.google.com www.google.com;"
+
+[[redirects]]
+  from = "/unlock"
+  to = "/.netlify/functions/unlock"
+  status = 200
+  force = true
 
 [functions]
   directory = "netlify/functions"

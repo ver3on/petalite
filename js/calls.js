@@ -42,14 +42,11 @@ async function insertArrangement(payload) {
 }
 
 async function updateArrangement(id, payload) {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('arrangements')
     .update(payload)
-    .eq('id', id)
-    .select()
-    .single();
+    .eq('id', id);
   if (error) throw error;
-  return data;
 }
 
 async function softDeleteArrangement(id) {
@@ -85,16 +82,12 @@ async function uploadArrangementPhoto(file, existingUrl = null) {
       await supabase.storage.from('arrangements').remove([oldPath]);
     }
   }
-
   const ext = file.name.split('.').pop();
   const path = `${crypto.randomUUID()}.${ext}`;
-
   const { error: uploadError } = await supabase.storage
     .from('arrangements')
     .upload(path, file, { upsert: false });
-
   if (uploadError) throw uploadError;
-
   const { data } = supabase.storage.from('arrangements').getPublicUrl(path);
   return data.publicUrl;
 }
@@ -114,16 +107,12 @@ async function uploadAboutPhoto(file, existingUrl = null) {
       await supabase.storage.from('about').remove([oldPath]);
     }
   }
-
   const ext = file.name.split('.').pop();
   const path = `${crypto.randomUUID()}.${ext}`;
-
   const { error: uploadError } = await supabase.storage
     .from('about')
     .upload(path, file, { upsert: false });
-
   if (uploadError) throw uploadError;
-
   const { data } = supabase.storage.from('about').getPublicUrl(path);
   return data.publicUrl;
 }
@@ -163,46 +152,15 @@ async function fetchShopSettings() {
   const { data, error } = await supabase
     .from('shop_settings')
     .select('*')
-    .limit(1)
-    .single();
+    .limit(1);
   if (error) throw error;
-  return data;
+  return data?.[0];
 }
 
 async function updateShopSettings(id, payload) {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('shop_settings')
     .update(payload)
-    .eq('id', id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
-}
-
-// ── Auth attempts ──
-
-async function fetchLatestLockout() {
-  const { data, error } = await supabase
-    .from('auth_attempts')
-    .select('*')
-    .order('attempted_at', { ascending: false })
-    .limit(10);
-  if (error) throw error;
-  return data;
-}
-
-async function insertAuthAttempt(lockoutUntil = null) {
-  const { error } = await supabase
-    .from('auth_attempts')
-    .insert([{ lockout_until: lockoutUntil }]);
-  if (error) throw error;
-}
-
-async function clearAuthAttempts() {
-  const { error } = await supabase
-    .from('auth_attempts')
-    .delete()
-    .neq('id', '00000000-0000-0000-0000-000000000000');
+    .eq('id', id);
   if (error) throw error;
 }
