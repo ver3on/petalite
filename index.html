@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Petal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/index.css" />
+</head>
+<body>
+
+  <!-- ── BANNER ── -->
+  <div id="closure-banner" class="closure-banner hidden">
+    <span id="banner-text"></span>
+  </div>
+
+  <!-- ── NAV ── -->
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo" id="nav-shop-name">Petal</a>
+      <nav class="nav-links">
+        <a href="#arrangements">Arrangements</a>
+        <a href="#order">Order</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="nav-hamburger hidden-desktop" id="nav-hamburger" aria-label="Menu">☰</button>
+    </div>
+    <div class="nav-mobile-menu hidden" id="nav-mobile-menu">
+      <a href="#arrangements">Arrangements</a>
+      <a href="#order">Order</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section id="hero" class="hero-section">
+    <div class="container hero-inner">
+      <h1 id="hero-shop-name">Petal</h1>
+      <p id="hero-tagline" class="hero-tagline">Fresh arrangements, made with love.</p>
+      <a href="#arrangements" class="btn btn-primary hero-cta">Browse arrangements</a>
+    </div>
+  </section>
+
+  <!-- ── ARRANGEMENTS ── -->
+  <section id="arrangements" class="arrangements-section">
+    <div class="container">
+      <h2 class="section-title">Our Arrangements</h2>
+      <div id="catalog-grid" class="catalog-grid"></div>
+    </div>
+  </section>
+
+  <!-- ── ORDER FORM ── -->
+  <section id="order" class="order-section">
+    <div class="container order-inner">
+      <h2 class="section-title">Place an Order</h2>
+      <p class="section-sub">Cash on pickup or delivery. We will confirm your order shortly.</p>
+      <form id="order-form" class="order-form card">
+
+        <div class="form-group">
+          <label for="o-name">Your name</label>
+          <input type="text" id="o-name" placeholder="Juan dela Cruz" required />
+        </div>
+
+        <div class="form-group">
+          <label for="o-contact">Phone or email</label>
+          <input type="text" id="o-contact" placeholder="09XX or email@example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="o-arrangement">Arrangement</label>
+          <select id="o-arrangement" required>
+            <option value="" disabled selected>Select an arrangement</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Fulfillment</label>
+          <div class="fulfillment-toggle">
+            <button type="button" class="fulfillment-btn active" data-value="pickup">Pickup</button>
+            <button type="button" class="fulfillment-btn" data-value="delivery">Delivery</button>
+          </div>
+          <input type="hidden" id="o-fulfillment" value="pickup" />
+        </div>
+
+        <div class="form-group">
+          <label for="o-date">Date needed</label>
+          <input type="date" id="o-date" required />
+        </div>
+
+        <div class="form-group">
+          <label for="o-note">Note <span class="optional">(optional)</span></label>
+          <textarea id="o-note" placeholder="Any special requests or details..."></textarea>
+        </div>
+
+        <p id="order-error" class="order-error hidden"></p>
+
+        <button type="submit" class="btn btn-primary order-submit" id="order-submit-btn">
+          Place order
+        </button>
+
+      </form>
+
+      <div id="order-confirmation" class="order-confirmation hidden animate-scale-in">
+        <div class="confirmation-icon">🌸</div>
+        <h3>Order received!</h3>
+        <p>Thank you. We will reach out to confirm your order soon.</p>
+        <button class="btn btn-outline" id="order-again-btn">Place another order</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
+  <section id="about" class="about-section">
+    <div class="container about-inner">
+      <div class="about-text">
+        <h2 class="section-title">About Us</h2>
+        <p id="about-body"></p>
+      </div>
+      <div id="about-photo-wrap" class="about-photo-wrap hidden">
+        <img id="about-photo" src="" alt="About photo" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTACT ── -->
+  <section id="contact" class="contact-section">
+    <div class="container contact-inner">
+      <h2 class="section-title">Contact & Hours</h2>
+      <div class="contact-grid">
+        <div class="contact-details">
+          <p id="contact-address" class="contact-row"></p>
+          <p id="contact-phone" class="contact-row"></p>
+          <div id="hours-table" class="hours-table"></div>
+        </div>
+        <div id="maps-wrap" class="maps-wrap hidden">
+          <iframe id="maps-iframe" src="" allowfullscreen loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="container">
+      <span id="footer-shop-name">Petal</span>
+    </div>
+  </footer>
+
+  <div id="toast-container"></div>
+
+  <script src="js/config.js"></script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+    window.supabase = createClient(PETAL_CONFIG.supabaseUrl, PETAL_CONFIG.supabaseAnonKey);
+
+    const scripts = ['js/theme.js', 'js/toast.js', 'js/calls.js', 'js/index-main.js'];
+    for (const src of scripts) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = src; s.onload = res; s.onerror = rej;
+        document.body.appendChild(s);
+      });
+    }
+  </script>
+
+</body>
+</html>
